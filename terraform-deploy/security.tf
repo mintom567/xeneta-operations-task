@@ -57,3 +57,24 @@ egress {
   cidr_blocks = ["0.0.0.0/0"]
 }
 }
+
+resource "aws_security_group" "ec2_pivot_sg" {
+  name        = "ec2-pivot-sg"
+  description = "Security group for EC2"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 22
+    protocol    = "tcp"
+    to_port     = 22
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+}

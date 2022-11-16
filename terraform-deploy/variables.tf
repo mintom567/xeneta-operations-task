@@ -27,13 +27,13 @@ variable "app_name"{
 }
 
 variable "app_port" {
-  description = "Port exposed by the docker image to redirect traffic to"
+  description = "Port exposed by the app"
   default     = 80
   type =string
 }
 
 variable "lb_port"{
-  description = "Port exposed by the docker image to redirect traffic to"
+  description = "Port exposed by the Load balancer"
   default     = 80
 }
 
