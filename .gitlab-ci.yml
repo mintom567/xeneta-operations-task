@@ -1,0 +1,70 @@
+stages:
+  - pre-infra
+  - publish
+  - terraform-plan
+  - terraform-apply
+
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  TAG: "1.0"
+  PRE_INFRA: "false"
+
+pre-infra-setup:
+  stage: pre-infra
+  image: amazon/aws-cli:2.8.12
+  script:
+    - aws ecr create-repository --repository-name rates --region us-east-1 --tags '[{"Key":"env","Value":"dev"}]'
+    - aws s3api create-bucket --bucket xeneta-rates-tf-state --region us-east-1
+  rules:
+    - if: '$PRE_INFRA == "true"'
+      when: manual
+
+# Dockerize the python application and publish it to ACR
+package-and-publish:
+  stage: publish
+  image: amazon/aws-cli
+  entrypoint: [""]
+  services:
+    - docker:20.10.16-dind
+  before_script:
+    - apk add python3
+    - apk add py3-pip
+    - pip3 install awscli    
+  script:
+    - aws ecr get-login-password | docker login --username AWS --password-stdin $DOCKER_REGISTRY
+    - docker build -t $DOCKER_REGISTRY/rates:$TAG .
+    - docker push $DOCKER_REGISTRY/rates:$TAG
+  when: on_success
+
+terraform-plan:
+  stage: terraform-plan
+  image: 
+    name: hashicorp/terraform:1.3.2
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+  before_script:
+    - export TF_VAR_app_image=$DOCKER_REGISTRY/rates:$TAG
+  script:
+    - cd ./terraform-deploy
+    - terraform init
+    - terraform plan -out "planfile"
+  when: on_success
+  needs: ["package-and-publish"]
+  artifacts:
+    paths:
+      - ./terraform-deploy
+
+terraform-apply:
+  stage: terraform-apply
+  image: 
+    name: hashicorp/terraform:1.3.2
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+  script:
+    - cd ./terraform-deploy
+    - terraform apply -auto-approve "planfile"
+  dependencies:
+    - terraform-plan
+  when: manual

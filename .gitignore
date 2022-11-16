@@ -1,0 +1,10 @@
+__pycache__
+.env
+.coverage
+.coverage.*
+.cache
+.Python
+rates/__pycache__
+terraform-deploy/.terraform/*
+terraform-deploy/.terraform.lock.hcl
+terraform-deploy/terraform.tfstate.backup

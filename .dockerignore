@@ -1,0 +1,7 @@
+Dockerfile
+README.md
+.dockerignore
+.gitignore
+.gitlab-ci.yml
+terrform-deploy/*
+readme_images/*
