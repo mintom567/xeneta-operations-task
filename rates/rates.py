@@ -1,6 +1,6 @@
 import psycopg2
 from datetime import datetime
-
+import os
 from flask import Flask, request, jsonify
 from psycopg2.extras import DictCursor
 from werkzeug.exceptions import BadRequest
