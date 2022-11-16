@@ -37,18 +37,18 @@ resource "aws_route" "internet_access" {
   gateway_id             = aws_internet_gateway.gw.id
 }
 
-# # Create a NAT gateway with an Elastic IP for each private subnet to get internet connectivity
-# resource "aws_eip" "gw" {
-#   count      = var.az_count
-#   vpc        = true
-#   depends_on = [aws_internet_gateway.gw]
-# }
+# Create a NAT gateway with an Elastic IP for each private subnet to get internet connectivity
+resource "aws_eip" "gw" {
+  count      = var.az_count
+  vpc        = true
+  depends_on = [aws_internet_gateway.gw]
+}
 
-# resource "aws_nat_gateway" "gw" {
-#   count         = var.az_count
-#   subnet_id     = element(aws_subnet.public.*.id, count.index)
-#   allocation_id = element(aws_eip.gw.*.id, count.index)
-# }
+resource "aws_nat_gateway" "gw" {
+  count         = var.az_count
+  subnet_id     = element(aws_subnet.public.*.id, count.index)
+  allocation_id = element(aws_eip.gw.*.id, count.index)
+}
 
 # Create a new route table for the private subnets, make it route non-local traffic through the NAT gateway to the internet
 resource "aws_route_table" "private" {
