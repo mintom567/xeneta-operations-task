@@ -14,7 +14,7 @@ This repo contains source code for rates-app api service developed using Python 
 
 #### pre-infra-setup:
 
-  * This job is required for creating the AWS S3 bucket for terraform tf-state storage and AWS ECR for image publishing. This job is manual you can enable by passing `PRE_INFRA` value `true`.
+  * This job is required for creating the AWS S3 bucket for terraform tf-state storage and AWS ECR for image publishing. This job is manual and can be enabled by passing `PRE_INFRA` value `true`.
 
 #### package-and-publish
    * This stage will dockerize the application and publish the rates-api to AWS ECR with the help of `awscli` and `docker-cli` using gitlab pipeline.
